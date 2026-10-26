@@ -19,3 +19,11 @@ spring:
 
 server:
    port: ${SERVER_PORT}
+
+miguelsouza:
+  pedidos:
+    clients:
+      produtos:
+        url: ${PRODUTOS_URL}
+      clientes:
+        url: ${CLIENTES_URL}
