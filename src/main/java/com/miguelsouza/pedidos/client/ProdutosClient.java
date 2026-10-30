@@ -7,10 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(name = "produtos", url = "${miguelsouza.pedidos.clients.produtos.url}")
-public class ProdutosClient {
+public interface ProdutosClient {
 
-    @GetMapping("{codigo")
-    ResponseEntity<ProdutoRepresentation> getProduto(@PathVariable Long codigo) {
-
-    }
+    @GetMapping("{codigo}")
+    ResponseEntity<ProdutoRepresentation> obterDados(@PathVariable Long codigo);
 }
