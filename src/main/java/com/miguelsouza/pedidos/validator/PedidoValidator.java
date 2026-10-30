@@ -4,6 +4,7 @@ import com.miguelsouza.pedidos.client.ClientsClient;
 import com.miguelsouza.pedidos.client.ProdutosClient;
 import com.miguelsouza.pedidos.client.representation.ClienteRepresentation;
 import com.miguelsouza.pedidos.client.representation.ProdutoRepresentation;
+import com.miguelsouza.pedidos.exception.ValidationException;
 import com.miguelsouza.pedidos.model.ItemPedido;
 import com.miguelsouza.pedidos.model.Pedido;
 import feign.FeignException;
@@ -31,7 +32,8 @@ public class PedidoValidator {
             ClienteRepresentation cliente = response.getBody();
             log.info("Cliente de codigo {} encontrado: {}", cliente.codigo(), cliente.nome());
         } catch (FeignException.NotFound e) {
-            throw new IllegalArgumentException("Cliente não encontrado: " + codigoCliente);
+            var message = String.format("Cliente de codigo %d não encontrado.", codigoCliente);
+            throw new ValidationException("codigoCliente", message);
         }
     }
 
@@ -41,7 +43,8 @@ public class PedidoValidator {
             ProdutoRepresentation produto = response.getBody();
             log.info("Produto de codigo {} encontrado: {}", produto.codigo(), produto.nome());
         } catch (FeignException.NotFound e) {
-            throw new IllegalArgumentException("Produto não encontrado: " + item.getCodigoProduto());
+            var message = String.format("Produto de codigo %d não encontrado.", item.getCodigoProduto());
+            throw new ValidationException("codigoProduto", message);
         }
     }
 }

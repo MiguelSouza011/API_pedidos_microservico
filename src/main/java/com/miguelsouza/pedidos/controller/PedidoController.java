@@ -1,7 +1,9 @@
 package com.miguelsouza.pedidos.controller;
 
 import com.miguelsouza.pedidos.dto.NovoPedidoDTO;
+import com.miguelsouza.pedidos.exception.ValidationException;
 import com.miguelsouza.pedidos.mapper.PedidoMapper;
+import com.miguelsouza.pedidos.model.ErroResposta;
 import com.miguelsouza.pedidos.model.Pedido;
 import com.miguelsouza.pedidos.service.PedidoService;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +22,14 @@ public class PedidoController {
 
     @PostMapping
     public ResponseEntity<Object> create(@RequestBody NovoPedidoDTO dto) {
-        var pedido = mapper.map(dto);
-        var novoPedido = service.save(pedido);
-        return ResponseEntity.ok(novoPedido.getCodigo());
+        try {
+            var pedido = mapper.map(dto);
+            var novoPedido = service.save(pedido);
+            return ResponseEntity.ok(novoPedido.getCodigo());
+        } catch (ValidationException e) {
+            var erro = new ErroResposta("Erro de validação", e.getField(), e.getMessage());
+            return ResponseEntity.badRequest().body(erro);
+        }
     }
 
     @GetMapping
