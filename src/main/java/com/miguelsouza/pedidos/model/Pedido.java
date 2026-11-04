@@ -1,9 +1,12 @@
 package com.miguelsouza.pedidos.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.miguelsouza.pedidos.model.enums.StatusPedido;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -48,5 +51,8 @@ public class Pedido {
     private DadosPagamento dadosPagamento;
 
     @OneToMany(mappedBy = "pedido")
+    @JsonManagedReference
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<ItemPedido> itens;
 }

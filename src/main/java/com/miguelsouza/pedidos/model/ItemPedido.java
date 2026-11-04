@@ -1,8 +1,11 @@
 package com.miguelsouza.pedidos.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 
@@ -18,6 +21,9 @@ public class ItemPedido {
 
     @JoinColumn(name = "codigo_pedido", nullable = false)
     @ManyToOne
+    @JsonBackReference
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Pedido pedido;
 
     @Column(name = "codigo_produto", nullable = false)

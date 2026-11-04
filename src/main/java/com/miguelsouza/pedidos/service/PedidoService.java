@@ -2,10 +2,12 @@ package com.miguelsouza.pedidos.service;
 
 import com.miguelsouza.pedidos.client.ServicoBancarioClient;
 import com.miguelsouza.pedidos.model.Pedido;
+import com.miguelsouza.pedidos.model.enums.StatusPedido;
 import com.miguelsouza.pedidos.repository.ItemPedidoRepository;
 import com.miguelsouza.pedidos.repository.PedidoRepository;
 import com.miguelsouza.pedidos.validator.PedidoValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +15,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PedidoService {
 
     private final PedidoRepository repository;
@@ -40,5 +43,25 @@ public class PedidoService {
 
     public List<Pedido> findAll(){
         return repository.findAll();
+    }
+
+    public void atualizarStatusPagamento(Long codigoPedido, String chavePagamento, boolean sucesso, String observacoes) {
+        var pedidoEncontrado = repository.
+                findByCodigoAndChavePagamento(codigoPedido, chavePagamento);
+
+        if(pedidoEncontrado.isEmpty()){
+            var msg = String.format("Pedido não encontrado para o codigo %d e chave de pagamento %s", codigoPedido, chavePagamento);
+            log.error(msg);
+            return;
+        }
+
+        Pedido pedido = pedidoEncontrado.get();
+        if(sucesso) {
+            pedido.setStatus(StatusPedido.PAGO);
+        } else {
+            pedido.setStatus(StatusPedido.ERRO_PAGAMENTO);
+            pedido.setObservacoes(observacoes);
+        }
+        repository.save(pedido);
     }
 }
