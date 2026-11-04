@@ -1,8 +1,11 @@
 package com.miguelsouza.pedidos.service;
 
 import com.miguelsouza.pedidos.client.ServicoBancarioClient;
+import com.miguelsouza.pedidos.exception.ItemNaoEncontradoException;
+import com.miguelsouza.pedidos.model.DadosPagamento;
 import com.miguelsouza.pedidos.model.Pedido;
 import com.miguelsouza.pedidos.model.enums.StatusPedido;
+import com.miguelsouza.pedidos.model.enums.TipoPagamento;
 import com.miguelsouza.pedidos.repository.ItemPedidoRepository;
 import com.miguelsouza.pedidos.repository.PedidoRepository;
 import com.miguelsouza.pedidos.validator.PedidoValidator;
@@ -63,5 +66,25 @@ public class PedidoService {
             pedido.setObservacoes(observacoes);
         }
         repository.save(pedido);
+    }
+
+    @Transactional
+    public void adicionarNovoPagamento(Long codigoPedido, String dadosCartao, TipoPagamento tipo) {
+        var pedidoEncontrado = repository.findById(codigoPedido);
+
+        if (pedidoEncontrado.isEmpty()) {
+            throw new ItemNaoEncontradoException("Pedido não encontrado para o codigo " + codigoPedido);
+        }
+
+        var pedido = pedidoEncontrado.get();
+        DadosPagamento dadosPagamento = new DadosPagamento();
+        dadosPagamento.setDados(dadosCartao);
+        dadosPagamento.setTipo(tipo);
+        pedido.setDadosPagamento(dadosPagamento);
+        pedido.setStatus(StatusPedido.REALIZADO);
+        pedido.setObservacoes("Novo pagamento realizado, aguardando confirmação");
+        repository.save(pedido);
+        String novaChavePagamento = servicoBancarioClient.solicitarPagamento(pedido);
+        pedido.setChavePagamento(novaChavePagamento);
     }
 }

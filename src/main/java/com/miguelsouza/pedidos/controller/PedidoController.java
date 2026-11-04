@@ -1,6 +1,8 @@
 package com.miguelsouza.pedidos.controller;
 
+import com.miguelsouza.pedidos.dto.AdicionarNovoPagamentoDTO;
 import com.miguelsouza.pedidos.dto.NovoPedidoDTO;
+import com.miguelsouza.pedidos.exception.ItemNaoEncontradoException;
 import com.miguelsouza.pedidos.exception.ValidationException;
 import com.miguelsouza.pedidos.mapper.PedidoMapper;
 import com.miguelsouza.pedidos.model.ErroResposta;
@@ -35,5 +37,16 @@ public class PedidoController {
     @GetMapping
     public ResponseEntity<List<Pedido>> findAll() {
         return ResponseEntity.ok(service.findAll());
+    }
+
+    @PostMapping("/pagamentos")
+    public ResponseEntity<Object> adicionarPagamento(@RequestBody AdicionarNovoPagamentoDTO dto) {
+        try {
+            service.adicionarNovoPagamento(dto.codigoPedido(), dto.dadosCartao(), dto.tipo());
+            return ResponseEntity.noContent().build();
+        } catch (ItemNaoEncontradoException e) {
+            var erro = new ErroResposta("Item não encontrado", "codigoPedido", e.getMessage());
+            return ResponseEntity.badRequest().body(erro);
+        }
     }
 }
