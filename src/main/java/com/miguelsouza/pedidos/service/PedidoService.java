@@ -13,6 +13,7 @@ import com.miguelsouza.pedidos.model.enums.TipoPagamento;
 import com.miguelsouza.pedidos.repository.ItemPedidoRepository;
 import com.miguelsouza.pedidos.repository.PedidoRepository;
 import com.miguelsouza.pedidos.validator.PedidoValidator;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -103,7 +104,7 @@ public class PedidoService {
         return pedido;
     }
 
-    public void carregarDadosCliente(Pedido pedido){
+    public void carregarDadosCliente(Pedido pedido) {
         Long codigoCliente = pedido.getCodigoCliente();
         var response = apiClient.obterDados(codigoCliente);
         pedido.setDadosCliente(response.getBody());

@@ -7,6 +7,8 @@ import com.miguelsouza.pedidos.exception.ValidationException;
 import com.miguelsouza.pedidos.mapper.PedidoMapper;
 import com.miguelsouza.pedidos.model.ErroResposta;
 import com.miguelsouza.pedidos.model.Pedido;
+import com.miguelsouza.pedidos.publisher.mapper.DetalhePedidoMapper;
+import com.miguelsouza.pedidos.publisher.representation.DetalhePedidoDTO;
 import com.miguelsouza.pedidos.service.PedidoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,7 @@ public class PedidoController {
 
     private final PedidoService service;
     private final PedidoMapper mapper;
+    private final DetalhePedidoMapper pedidoMapper;
 
     @PostMapping
     public ResponseEntity<Object> create(@RequestBody NovoPedidoDTO dto) {
@@ -48,5 +51,13 @@ public class PedidoController {
             var erro = new ErroResposta("Item não encontrado", "codigoPedido", e.getMessage());
             return ResponseEntity.badRequest().body(erro);
         }
+    }
+
+    @GetMapping("{codigo}")
+    public ResponseEntity<DetalhePedidoDTO> obterDetalhesPedido(@PathVariable Long codigo){
+        return service.carregarDadosCompletosPedido(codigo)
+                .map(pedidoMapper::map)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

@@ -1,6 +1,8 @@
 package com.miguelsouza.pedidos.publisher.mapper;
 
+import com.miguelsouza.pedidos.model.ItemPedido;
 import com.miguelsouza.pedidos.model.Pedido;
+import com.miguelsouza.pedidos.publisher.representation.DetalheItemPedidoDTO;
 import com.miguelsouza.pedidos.publisher.representation.DetalhePedidoDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -22,4 +24,7 @@ public interface DetalhePedidoMapper {
     @Mapping(source = "status", target = "status")
     @Mapping(source = "itens", target = "itens")
     DetalhePedidoDTO map(Pedido pedido);
+
+    @Mapping(source = "nomeProduto", target = "nome")
+    DetalheItemPedidoDTO map(ItemPedido item);
 }
