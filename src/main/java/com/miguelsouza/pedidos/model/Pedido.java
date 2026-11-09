@@ -1,6 +1,7 @@
 package com.miguelsouza.pedidos.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.miguelsouza.pedidos.client.representation.ClienteRepresentation;
 import com.miguelsouza.pedidos.model.enums.StatusPedido;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -55,4 +56,7 @@ public class Pedido {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<ItemPedido> itens;
+
+    @Transient
+    private ClienteRepresentation dadosCliente;
 }

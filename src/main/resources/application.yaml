@@ -27,3 +27,10 @@ miguelsouza:
         url: ${PRODUTOS_URL}
       clientes:
         url: ${CLIENTES_URL}
+  config:
+    kafka:
+      server-url: ${KAFKA_SERVER_URL}
+      topics:
+        pedidos-pagos: 'icompras.pedidos-pagos'
+        pedidos-faturados: 'icompras.pedidos-faturados'
+        pedidos-enviados: 'icompras.pedidos-enviados'
