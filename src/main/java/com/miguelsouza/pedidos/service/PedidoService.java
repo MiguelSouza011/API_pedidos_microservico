@@ -3,20 +3,18 @@ package com.miguelsouza.pedidos.service;
 import com.miguelsouza.pedidos.client.ClientsClient;
 import com.miguelsouza.pedidos.client.ProdutosClient;
 import com.miguelsouza.pedidos.client.ServicoBancarioClient;
-import com.miguelsouza.pedidos.client.representation.ClienteRepresentation;
 import com.miguelsouza.pedidos.exception.ItemNaoEncontradoException;
 import com.miguelsouza.pedidos.model.DadosPagamento;
 import com.miguelsouza.pedidos.model.ItemPedido;
 import com.miguelsouza.pedidos.model.Pedido;
 import com.miguelsouza.pedidos.model.enums.StatusPedido;
 import com.miguelsouza.pedidos.model.enums.TipoPagamento;
+import com.miguelsouza.pedidos.publisher.PagamentoPublisher;
 import com.miguelsouza.pedidos.repository.ItemPedidoRepository;
 import com.miguelsouza.pedidos.repository.PedidoRepository;
 import com.miguelsouza.pedidos.validator.PedidoValidator;
-import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +32,7 @@ public class PedidoService {
     private final ServicoBancarioClient servicoBancarioClient;
     private final ClientsClient apiClient;
     private final ProdutosClient apiProduto;
+    private final PagamentoPublisher pagamentoPublisher;
 
     @Transactional
     public Pedido save(Pedido pedido) {
@@ -69,12 +68,19 @@ public class PedidoService {
 
         Pedido pedido = pedidoEncontrado.get();
         if(sucesso) {
-            pedido.setStatus(StatusPedido.PAGO);
+            prepararEPublicarPedidoPago(pedido);
         } else {
             pedido.setStatus(StatusPedido.ERRO_PAGAMENTO);
             pedido.setObservacoes(observacoes);
         }
         repository.save(pedido);
+    }
+
+    private void prepararEPublicarPedidoPago(Pedido pedido) {
+        pedido.setStatus(StatusPedido.PAGO);
+        carregarDadosCliente(pedido);
+        carregarItensPedidos(pedido);
+        pagamentoPublisher.publicar(pedido);
     }
 
     @Transactional
